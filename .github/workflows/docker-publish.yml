@@ -11,5 +11,5 @@ jobs:
         run: |
           sudo apt update && sudo apt install -y ffmpeg
           pip install yt-dlp
-          url=$(yt-dlp --cookies newtab_cookies.txt -f "best" -g "http://www.youtube.com/watch?v=IQgM5PYvRYA")
+          url=$(yt-dlp --cookies newtab_cookies.txt --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" --no-check-certificate -f "best" -g "http://www.youtube.com/watch?v=IQgM5PYvRYA")
           ffmpeg -re -i "$url" -c:v libx264 -preset ultrafast -b:v 1500k -c:a aac -b:a 128k -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
