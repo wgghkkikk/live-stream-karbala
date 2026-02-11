@@ -1,6 +1,16 @@
-FROM python:3.10-slim
-RUN apt-get update && apt-get install -y ffmpeg curl && pip install --upgrade yt-dlp
-WORKDIR /app
-COPY newtab_cookies.txt /app/newtab_cookies.txt
-CMD url=$(yt-dlp --cookies /app/newtab_cookies.txt --geo-bypass --no-check-certificate -f "best" -g "http://www.youtube.com/watch?v=IQgM5PYvRYA") && \
-    ffmpeg -re -i "$url" -c:v libx264 -preset ultrafast -b:v 1500k -maxrate 1500k -bufsize 3000k -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+name: Stream To YouTube
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Start Live Stream
+        run: |
+          sudo apt update && sudo apt install -y ffmpeg
+          pip install yt-dlp
+          # محاولة سحب الرابط مع تأخير زمني وتمويه المتصفح
+          url=$(yt-dlp --cookies newtab_cookies.txt --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --geo-bypass --no-check-certificate -f "best" -g "http://www.youtube.com/watch?v=IQgM5PYvRYA")
+          ffmpeg -re -i "$url" -c:v libx264 -preset ultrafast -b:v 1500k -maxrate 1500k -bufsize 3000k -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
