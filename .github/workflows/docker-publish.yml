@@ -1,14 +1,28 @@
-name: Final Stream Solution
-on:
-  workflow_dispatch:
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Start Live Stream
-        run: |
-          sudo apt update && sudo apt install -y ffmpeg
-          # رابط البث المباشر للعتبة الحسينية (رابط خام)
-          ffmpeg -re -i "https://rtmp.imamhussain.org/live/imamhussain/playlist.m3u8" -c:v libx264 -preset ultrafast -b:v 1500k -c:a aac -b:a 128k -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+while true; do
+  # جلب الساعة الحالية بتوقيت بغداد
+  current_time=$(date +%H:%M)
+
+  # 1. فقرة أذان الظهر (من 12:15 إلى 12:30)
+  if [[ "$current_time" > "12:15" && "$current_time" < "12:30" ]]; then
+    file="dhur.mp4"
+    # كص أول دقيقتين فقط مثل ما ردت ومسح اللوجو
+    ffmpeg -re -i "$file" -t 120 -vf "delogo=x=10:y=10:w=150:h=60" -c:v libx264 -preset ultrafast -b:v 2000k -c:a aac -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+
+  # 2. فقرة أذان المغرب (من 18:00 إلى 18:30)
+  elif [[ "$current_time" > "18:00" && "$current_time" < "18:30" ]]; then
+    file="maghrib.mp4"
+    ffmpeg -re -i "$file" -c:v libx264 -preset ultrafast -b:v 2000k -c:a aac -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+
+  # 3. فقرة دعاء الصباح (من 07:00 إلى 09:00)
+  elif [[ "$current_time" > "07:00" && "$current_time" < "09:00" ]]; then
+    file="sabah.mp4"
+    ffmpeg -re -i "$file" -c:v libx264 -preset ultrafast -b:v 2000k -c:a aac -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+
+  # 4. البث العام (باقي الأوقات - ومن ضمنها هسة)
+  else
+    file="main_live.mp4"
+    ffmpeg -re -i "$file" -c:v libx264 -preset ultrafast -b:v 2000k -c:a aac -f flv "rtmp://a.rtmp.youtube.com/live2/q12g-s6wc-0y03-0ua5-6e6p"
+  fi
+
+  sleep 5
+done
